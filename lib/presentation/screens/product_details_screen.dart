@@ -1,6 +1,8 @@
 import 'package:fashion_store/constants/colors.dart';
 import 'package:fashion_store/logic/core/view_models/cart_view_model.dart';
 import 'package:fashion_store/logic/core/view_models/provider.dart';
+import 'package:fashion_store/presentation/screens/new_product_screen.dart';
+import 'package:fashion_store/presentation/utility/icon_button_counter.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:fashion_store/presentation/router/navigators.dart';
@@ -10,10 +12,11 @@ import 'package:fashion_store/data/models/product_model.dart';
 
 class ProductDetailsScreen extends StatefulHookConsumerWidget {
   final ProductModel productModel;
-  CartItem? cartItem = CartItem();
+  CartItem cartItem = CartItem(quantity: 1);
 
   ProductDetailsScreen({
     Key? key,
+    required this.cartItem,
     required this.productModel,
   }) : super(key: key);
 
@@ -22,6 +25,13 @@ class ProductDetailsScreen extends StatefulHookConsumerWidget {
 }
 
 class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
+  int? selectedItem;
+  onSelect(int index) {
+    setState(() {
+      selectedItem = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,14 +53,15 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                 children: [
                   IconButton(
                       onPressed: () {}, icon: const Icon(Icons.favorite)),
-                  IconButton(
-                      onPressed: () {
-                        navigatePush(context, const CartScreen());
-                      },
-                      icon: const Icon(
-                        Icons.shopping_bag,
-                        color: AppColors.rowTextColor,
-                      )),
+                  IconBtnWithCounter(
+                      icon: const Icon(Icons.shopping_cart_rounded),
+                      numOfitem: ref.watch(cartVM).items.length,
+                      press: () {
+                        navigatePush(
+                          context,
+                          const CartScreen(),
+                        );
+                      })
                 ],
               )
             ],
@@ -73,15 +84,47 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   'color',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
-                Row(
-                  children: const [
-                    CircleAvatar(),
-                    SizedBox(width: 5),
-                    CircleAvatar(),
-                    SizedBox(width: 5),
-                    CircleAvatar(),
-                    SizedBox(width: 20)
-                  ],
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    alignment: Alignment.center,
+                    height: 50,
+                    child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
+                        itemCount: cartItem.color.length,
+                        itemBuilder: (context, i) {
+                          return InkWell(
+                            onTap: () {
+                              onSelect(i);
+                            },
+                            child: selectedItem != null && selectedItem == i
+                                ? Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      CircleAvatar(
+                                          backgroundColor: cartItem.color[i]),
+                                      const Positioned(
+                                        top: 0,
+                                        right: 0,
+                                        left: 0,
+                                        bottom: 0,
+                                        child: Center(
+                                            child: Icon(
+                                          Icons.star,
+                                          color: Colors.grey,
+                                        )),
+                                      ),
+                                    ],
+                                  )
+                                : CircleAvatar(
+                                    backgroundColor: cartItem.color[i]),
+                            //  ),
+                          );
+                        }
+                        // )
+                        ),
+                  ),
                 )
               ],
             ),
@@ -108,19 +151,48 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
               ),
               Expanded(
                 flex: 2,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Text('XS'),
-                    Text('S'),
-                    Text('M'),
-                    Text('L'),
-                    Text('XL'),
-                    SizedBox(
-                      width: 20,
+                child: SizedBox(
+                  height: 20,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: cartItem.size.length,
+                    itemBuilder: (context, i) => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        InkWell(
+                       onTap:  (){
+                         onSelect(i);
+                  },
+                     child: selectedItem != null && selectedItem == i
+                          ? Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Text(cartItem.size[i]),
+                           Positioned(
+                            top: 0,
+                            right: 0,
+                            left: 0,
+                            bottom: 0,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.black)
+                                  ),
+
+                                )),
+                        ],
+                      )
+                          : Text(cartItem.size[i])),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],

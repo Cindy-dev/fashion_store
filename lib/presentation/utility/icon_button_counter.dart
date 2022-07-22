@@ -19,19 +19,11 @@ class IconBtnWithCounter extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(100),
       onTap: press,
-      child: Stack(
+      child:
+      Stack(
         clipBehavior: Clip.none,
         children: [
-          Container(
-              padding: const EdgeInsets.all((12)),
-              height: (55),
-              width: (55),
-              decoration: BoxDecoration(
-                color: AppColors.borderColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: icon
-          ),
+          Container(padding: const EdgeInsets.all((12)), child: icon),
           if (numOfitem != 0)
             Positioned(
               top: -3,

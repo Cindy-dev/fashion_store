@@ -1,11 +1,13 @@
 import 'package:fashion_store/constants/colors.dart';
 import 'package:fashion_store/data/data_providers/product_provider.dart';
+import 'package:fashion_store/logic/core/view_models/cart_view_model.dart';
 import 'package:fashion_store/presentation/router/navigators.dart';
 import 'package:fashion_store/presentation/screens/product_details_screen.dart';
 import 'package:fashion_store/presentation/utility/row_text.dart';
 import 'package:flutter/material.dart';
 import '../../constants/text.dart';
 
+late CartItem cartItem;
 
 class NewProductScreen extends StatelessWidget {
   const NewProductScreen({Key? key}) : super(key: key);
@@ -48,8 +50,13 @@ class NewProductScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: InkWell(
-                    onTap: () => navigatePush(context,
-                        ProductDetailsScreen(productModel: productList[i])),
+                    onTap: () => navigatePush(
+                        context,
+                        ProductDetailsScreen(
+                          productModel: productList[i],
+                          cartItem: cartItem =
+                              CartItem(quantity: productList[i].quantity),
+                        )),
                     child: Container(
                       margin: const EdgeInsets.only(left: 16, right: 16),
                       decoration: BoxDecoration(

@@ -11,7 +11,7 @@ class CartScreen extends StatefulHookConsumerWidget {
   const CartScreen({Key? key}) : super(key: key);
 
   @override
-  _CartScreenState createState() => _CartScreenState();
+  ConsumerState<CartScreen> createState() => _CartScreenState();
 }
 
 class _CartScreenState extends ConsumerState<CartScreen> {
@@ -38,6 +38,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               child: ListView.builder(
                   itemCount: viewModel.cartItems.length,
                   itemBuilder: (context, i) {
+                    final item = viewModel.cartItems[i];
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -56,36 +57,49 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 CircleAvatar(
-                                  radius: 30,
+                                  radius: 50,
                                   backgroundColor:
                                       AppColors.containerTransparent,
-                                  backgroundImage: AssetImage(viewModel
+                                  child: Image.asset(viewModel
                                       .cartItems[i].productModel!.image),
                                 ),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(viewModel
-                                        .cartItems[i].productModel!.name),
+                                    Text(
+                                      viewModel.cartItems[i].productModel!.name,
+                                      textAlign: TextAlign.center,
+                                    ),
                                     Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         IconButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              ref
+                                                  .read(cartVM)
+                                                  .decreaseCartItem(item);
+                                            },
                                             icon: const Icon(Icons.remove)),
                                         Text(viewModel.cartItems[i].quantity
                                             .toString()),
                                         IconButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              ref
+                                                  .read(cartVM)
+                                                  .increaseCartItem(item);
+                                            },
                                             icon: const Icon(Icons.add)),
+                                        Text(
+                                            '\$ ${item.quantity * item.productModel!.price}'),
                                       ],
                                     )
                                   ],
                                 ),
                                 IconButton(
                                     onPressed: () {
-                                      final item = viewModel.cartItems[i];
                                       ref.read(cartVM).removeCartItem(item);
                                     },
                                     icon: const Icon(Icons.cancel_outlined))
@@ -95,15 +109,24 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     );
                   }),
             ),
-      // Container(
-      //   alignment: Alignment.center,
-      //   child: Text(
-      //     '${viewModel.cartItems[i].quantity! * viewModel.cartItems[i].productModel!.price}',
-      //   ),
-      // )
-      // persistentFooterButtons: [
-      //
-      // ],
+      persistentFooterButtons: [
+        Container(
+          alignment: Alignment.center,
+          margin: const EdgeInsets.all(10),
+          height: 60,
+          width: double.infinity,
+          decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: AppColors.rowTextColor,
+              border: Border.all(color: AppColors.borderColor)),
+          child: Text(
+            'Total Amount : \$ ${ref.watch(cartVM).totalAmount()}',
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          ),
+        )
+      ],
     );
   }
 }
